@@ -1,0 +1,151 @@
+<div class="container">
+  <div class="form-container">
+    <h2>{{ isEditing ? 'Editar Mangá' : 'Registrar Novo Mangá' }}</h2>
+    
+    <div class="form-group">
+      <label for="titulo">Título:</label>
+      <input 
+        type="text" 
+        id="titulo" 
+        [(ngModel)]="novoManga.titulo" 
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="descricao">Descrição:</label>
+      <textarea 
+        id="descricao" 
+        [(ngModel)]="novoManga.descricao" 
+        required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="autor">Autor:</label>
+      <input 
+        type="text" 
+        id="autor" 
+        [(ngModel)]="novoManga.autor" 
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="imageUrl">URL da Imagem:</label>
+      <input 
+        type="url" 
+        id="imageUrl" 
+        [(ngModel)]="novoManga.imageUrl" 
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="generos">Gêneros (separados por vírgula):</label>
+      <input 
+        type="text" 
+        id="generos" 
+        [(ngModel)]="generosInput" 
+        required>
+    </div>
+
+    <!-- Seção de Capítulos -->
+    <div class="capitulos-section">
+      <h3>Capítulos</h3>
+      <button class="add-button" (click)="adicionarCapitulo()">Adicionar Capítulo</button>
+      
+      <div class="capitulo-item" *ngFor="let capitulo of novoManga.capitulos; let i = index">
+        <div class="form-group">
+          <label>Número do Capítulo:</label>
+          <input type="number" [(ngModel)]="capitulo.numero" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Título do Capítulo:</label>
+          <input type="text" [(ngModel)]="capitulo.titulo" required>
+        </div>
+        
+        <div class="form-group">
+          <label>URL do Capítulo:</label>
+          <input type="url" [(ngModel)]="capitulo.url" required>
+        </div>
+
+        <button class="remove-button" (click)="removerCapitulo(i)">Remover Capítulo</button>
+      </div>
+    </div>
+
+    <!-- Seção de Anime -->
+    <div class="anime-section">
+      <h3>Adaptação em Anime</h3>
+      <div class="form-group">
+        <label>Título do Anime:</label>
+        <input type="text" [(ngModel)]="novoManga.animeAdaptacao!.titulo">
+      </div>
+
+      <div class="form-group">
+        <label>Número de Temporadas:</label>
+        <input type="number" [(ngModel)]="novoManga.animeAdaptacao!.temporadas">
+      </div>
+
+      <div class="form-group">
+        <label>Número de Episódios:</label>
+        <input type="number" [(ngModel)]="novoManga.animeAdaptacao!.episodios">
+      </div>
+
+      <div class="form-group">
+        <label>Status:</label>
+        <select [(ngModel)]="novoManga.animeAdaptacao!.status">
+          <option value="Em andamento">Em andamento</option>
+          <option value="Finalizado">Finalizado</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="submit-button" (click)="registrarManga()">
+        {{ isEditing ? 'Atualizar' : 'Registrar' }} Mangá
+      </button>
+      <button *ngIf="isEditing" class="cancel-button" (click)="cancelarEdicao()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  <div class="manga-grid">
+    <div class="manga-card" *ngFor="let manga of mangas$ | async">
+      <img [src]="manga.imageUrl" [alt]="manga.titulo">
+      <h3>{{manga.titulo}}</h3>
+      <div class="author">{{manga.autor}}</div>
+      <div class="description">{{manga.descricao}}</div>
+      
+      <div class="genre-tags">
+        <span class="genre-tag" *ngFor="let genero of manga.generos">
+          {{genero}}
+        </span>
+      </div>
+      
+      <div class="chapters">
+        <h4>Capítulos</h4>
+        <ul>
+          <li *ngFor="let capitulo of manga.capitulos">
+            {{capitulo.numero}} - {{capitulo.titulo}}
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="manga.animeAdaptacao" class="anime-info">
+        <h4>Adaptação em Anime</h4>
+        <p>{{manga.animeAdaptacao.titulo}}</p>
+        <p>Temporadas: {{manga.animeAdaptacao.temporadas}}</p>
+        <p>Episódios: {{manga.animeAdaptacao.episodios}}</p>
+        <p>Status: {{manga.animeAdaptacao.status}}</p>
+      </div>
+      
+      <div class="card-actions">
+        <button class="edit-button" (click)="editarManga(manga)">
+          Editar
+        </button>
+        <button class="delete-button" (click)="excluirManga(manga.id!)">
+          Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
