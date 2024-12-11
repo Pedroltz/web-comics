@@ -1,18 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Firestore, collection, addDoc, collectionData, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { Manga, Capitulo, AnimeInfo } from '../../models/manga.interface';
+import { Manga, Capitulo, AnimeInfo, Pagina } from '../../models/manga.interface';
+import { FileUploadService } from '../../services/file-upload.service';
+import { MangaViewerComponent } from '../../components/manga-viewer/manga-viewer.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule, MangaViewerComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  private firestore: Firestore = inject(Firestore);
+  private fileUploadService: FileUploadService = inject(FileUploadService);
+
   mangas$: Observable<Manga[]>;
   generosInput: string = '';
   isEditing: boolean = false;
@@ -25,15 +31,11 @@ export class HomeComponent implements OnInit {
     imageUrl: '',
     generos: [],
     capitulos: [],
-    animeAdaptacao: {
-      titulo: '',
-      temporadas: 0,
-      episodios: 0,
-      status: 'Em andamento'
-    }
+    temAnime: false,
+    animeAdaptacao: undefined
   };
 
-  constructor(private firestore: Firestore) {
+  constructor() {
     const mangaCollection = collection(this.firestore, 'mangas');
     this.mangas$ = collectionData(mangaCollection, { idField: 'id' }) as Observable<Manga[]>;
   }
@@ -48,34 +50,64 @@ export class HomeComponent implements OnInit {
       imageUrl: '',
       generos: [],
       capitulos: [],
-      animeAdaptacao: {
-        titulo: '',
-        temporadas: 0,
-        episodios: 0,
-        status: 'Em andamento'
-      }
+      temAnime: false,
+      animeAdaptacao: undefined
     };
     this.generosInput = '';
     this.isEditing = false;
     this.editingId = undefined;
   }
 
-  async registrarManga() {
-    this.novoManga.generos = this.generosInput.split(',').map(g => g.trim());
+  handleAnimeToggle(event: any) {
+    const hasAnime = event.target.checked;
+    this.novoManga.temAnime = hasAnime;
     
+    if (hasAnime) {
+      this.novoManga.animeAdaptacao = {
+        titulo: '',
+        temporadas: 1,
+        episodios: 1,
+        status: 'Em andamento'
+      };
+    } else {
+      this.novoManga.animeAdaptacao = undefined;
+    }
+  }
+
+  async registrarManga() {
     try {
+      // Validar campos básicos
+      if (!this.novoManga.titulo || !this.novoManga.descricao || !this.novoManga.autor || !this.novoManga.imageUrl) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
+
+      // Validar campos do anime apenas se temAnime for true
+      if (this.novoManga.temAnime) {
+        if (!this.novoManga.animeAdaptacao?.titulo || 
+            !this.novoManga.animeAdaptacao?.temporadas || 
+            !this.novoManga.animeAdaptacao?.episodios) {
+          alert('Por favor, preencha todas as informações do anime.');
+          return;
+        }
+      }
+
+      this.novoManga.generos = this.generosInput.split(',').map(g => g.trim());
       const mangaCollection = collection(this.firestore, 'mangas');
       
-      if (this.isEditing && this.editingId !== undefined) {
-        // Update existing manga
+      const mangaData = { 
+        ...this.novoManga,
+        // Se não tem anime, garantir que os campos relacionados sejam undefined
+        animeAdaptacao: this.novoManga.temAnime ? this.novoManga.animeAdaptacao : undefined
+      };
+
+      if (this.isEditing && this.editingId) {
         const mangaRef = doc(this.firestore, 'mangas', this.editingId);
-        const mangaData = { ...this.novoManga };
-        delete mangaData.id; // Remove id before update
+        delete mangaData.id;
         await updateDoc(mangaRef, mangaData);
         alert('Mangá atualizado com sucesso!');
       } else {
-        // Add new manga
-        await addDoc(mangaCollection, this.novoManga);
+        await addDoc(mangaCollection, mangaData);
         alert('Mangá registrado com sucesso!');
       }
       
@@ -86,23 +118,41 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  async handlePageUpload(event: Event, capituloIndex: number) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const files = Array.from(input.files);
+    
+    try {
+      const urls = await this.fileUploadService.uploadMultipleFiles(
+        files,
+        this.editingId || 'temp',
+        this.novoManga.capitulos[capituloIndex].numero
+      );
+
+      const paginas: Pagina[] = urls.map((url, index) => ({
+        numero: index + 1,
+        imageUrl: url
+      }));
+
+      this.novoManga.capitulos[capituloIndex].paginas = paginas;
+    } catch (error) {
+      console.error('Erro ao fazer upload das páginas:', error);
+      alert('Erro ao fazer upload das páginas');
+    }
+  }
+
   editarManga(manga: Manga) {
     this.isEditing = true;
     this.editingId = manga.id;
+    
     this.novoManga = {
-      titulo: manga.titulo,
-      descricao: manga.descricao,
-      autor: manga.autor,
-      imageUrl: manga.imageUrl,
-      generos: manga.generos,
-      capitulos: manga.capitulos,
-      animeAdaptacao: manga.animeAdaptacao || {
-        titulo: '',
-        temporadas: 0,
-        episodios: 0,
-        status: 'Em andamento'
-      }
+      ...manga,
+      temAnime: manga.temAnime || false,
+      animeAdaptacao: manga.animeAdaptacao ? { ...manga.animeAdaptacao } : undefined
     };
+    
     this.generosInput = manga.generos.join(', ');
   }
 
@@ -124,13 +174,18 @@ export class HomeComponent implements OnInit {
       numero: this.novoManga.capitulos.length + 1,
       titulo: '',
       dataPublicacao: new Date(),
-      url: ''
+      url: '',
+      paginas: []
     };
     this.novoManga.capitulos.push(novoCapitulo);
   }
 
   removerCapitulo(index: number) {
     this.novoManga.capitulos.splice(index, 1);
+    // Reajustar números dos capítulos
+    this.novoManga.capitulos.forEach((cap, idx) => {
+      cap.numero = idx + 1;
+    });
   }
 
   cancelarEdicao() {

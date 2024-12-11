@@ -6,14 +6,10 @@ import {
   collectionData,
   docData,
   query,
-  where,
-  updateDoc,
-  arrayUnion,
-  arrayRemove
+  where
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Manga } from '../models/manga.interface';
-import { HistoricoLeitura } from '../models/user.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -23,32 +19,36 @@ export class MangaService {
 
   getMangas(): Observable<Manga[]> {
     const mangasRef = collection(this.firestore, 'mangas');
-    return collectionData(mangasRef, { idField: 'id' }) as Observable<Manga[]>;
+    return collectionData(mangasRef, { idField: 'id' }).pipe(
+      map(mangas => this.processMangas(mangas as Manga[]))
+    );
   }
 
   getMangaById(id: string): Observable<Manga | null> {
+    console.log('Buscando mangá com ID:', id);
     const mangaRef = doc(this.firestore, `mangas/${id}`);
-    return docData(mangaRef, { idField: 'id' }) as Observable<Manga>;
+    return docData(mangaRef, { idField: 'id' }).pipe(
+      map(manga => {
+        if (!manga) return null;
+        const processed = this.processManga(manga as Manga);
+        console.log('Mangá processado:', processed);
+        return processed;
+      })
+    );
   }
 
-  async adicionarFavorito(userId: string, mangaId: string) {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    return updateDoc(userRef, {
-      favoritos: arrayUnion(mangaId)
-    });
+  private processManga(manga: Manga): Manga {
+    return {
+      ...manga,
+      capitulos: manga.capitulos.map(cap => ({
+        ...cap,
+        paginas: Array.isArray(cap.paginas) ? cap.paginas : [],
+        dataPublicacao: cap.dataPublicacao ? new Date(cap.dataPublicacao) : new Date()
+      }))
+    };
   }
 
-  async removerFavorito(userId: string, mangaId: string) {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    return updateDoc(userRef, {
-      favoritos: arrayRemove(mangaId)
-    });
-  }
-
-  async atualizarHistorico(userId: string, historicoLeitura: HistoricoLeitura) {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    return updateDoc(userRef, {
-      historico: arrayUnion(historicoLeitura)
-    });
+  private processMangas(mangas: Manga[]): Manga[] {
+    return mangas.map(manga => this.processManga(manga));
   }
 }

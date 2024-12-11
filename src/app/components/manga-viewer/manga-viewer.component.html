@@ -1,0 +1,42 @@
+<div class="viewer-container">
+    <div class="viewer-header">
+      <h2>{{capitulo.titulo}}</h2>
+      <div class="page-info">
+        Página {{currentPage + 1}} de {{totalPages}}
+      </div>
+    </div>
+  
+    <div class="viewer-content" (click)="nextPage()">
+      <button 
+        class="nav-button prev" 
+        (click)="previousPage(); $event.stopPropagation()"
+        [class.disabled]="currentPage === 0"
+      >‹</button>
+      
+      <img 
+        *ngIf="currentPageUrl"
+        [src]="currentPageUrl" 
+        [alt]="'Página ' + (currentPage + 1)"
+        class="manga-page"
+      >
+      <div *ngIf="!currentPageUrl" class="error-message">
+        Imagem não encontrada
+      </div>
+      
+      <button 
+        class="nav-button next" 
+        (click)="nextPage(); $event.stopPropagation()"
+        [class.disabled]="currentPage === totalPages - 1"
+      >›</button>
+    </div>
+  
+    <div class="page-navigator">
+      <button 
+        *ngFor="let pagina of capitulo.paginas; let i = index"
+        [class.active]="i === currentPage"
+        (click)="goToPage(i)"
+      >
+        {{ i + 1 }}
+      </button>
+    </div>
+  </div>

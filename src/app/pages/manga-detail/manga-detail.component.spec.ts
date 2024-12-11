@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NavarComponent } from './navar.component';
+import { MangaDetailComponent } from './manga-detail.component';
 
-describe('NavarComponent', () => {
-  let component: NavarComponent;
-  let fixture: ComponentFixture<NavarComponent>;
+describe('MangaDetailComponent', () => {
+  let component: MangaDetailComponent;
+  let fixture: ComponentFixture<MangaDetailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavarComponent]
+      imports: [MangaDetailComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(NavarComponent);
+    fixture = TestBed.createComponent(MangaDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
