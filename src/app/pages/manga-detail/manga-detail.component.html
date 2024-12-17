@@ -1,57 +1,68 @@
 <div class="container" *ngIf="manga$ | async as manga">
-    <!-- Viewer Modal -->
-    <div *ngIf="isViewing && selectedCapitulo" class="viewer-modal">
-      <button class="close-button" (click)="fecharVisualizacao()">×</button>
-      <app-manga-viewer [capitulo]="selectedCapitulo"></app-manga-viewer>
+  <!-- Viewer Modal -->
+  <div *ngIf="isViewing && selectedCapitulo" class="viewer-modal">
+    <app-manga-viewer 
+      [capitulo]="selectedCapitulo"
+      [mangaId]="mangaId"
+      (onClose)="fecharVisualizacao()">
+    </app-manga-viewer>
+  </div>
+
+  <!-- Manga Header -->
+  <div class="manga-header">
+    <img [src]="manga.imageUrl" [alt]="manga.titulo" class="manga-cover">
+    <div class="manga-info">
+      <h1>{{manga.titulo}}</h1>
+      <p class="author">{{manga.autor}}</p>
+      <div class="genre-tags">
+        <span class="genre-tag" *ngFor="let genero of manga.generos">
+          {{genero}}
+        </span>
+      </div>
+      <p class="description">{{manga.descricao}}</p>
     </div>
-  
-    <div class="manga-header">
-      <img [src]="manga.imageUrl" [alt]="manga.titulo" class="manga-cover">
-      <div class="manga-info">
-        <h1>{{manga.titulo}}</h1>
-        <p class="author">{{manga.autor}}</p>
-        <div class="genre-tags">
-          <span class="genre-tag" *ngFor="let genero of manga.generos">
-            {{genero}}
+  </div>
+
+  <!-- Chapters Section -->
+  <div class="chapters-section">
+    <h2>Capítulos</h2>
+    <div class="chapters-list">
+      <div *ngFor="let capitulo of manga.capitulos" class="chapter-item">
+        <div class="chapter-info">
+          <span class="chapter-number">Capítulo {{capitulo.numero}}</span>
+          <span class="chapter-title">{{capitulo.titulo}}</span>
+          <span class="chapter-date">{{capitulo.dataPublicacao | date}}</span>
+          <span class="page-count" *ngIf="capitulo.paginas?.length">
+            ({{capitulo.paginas.length}} páginas)
           </span>
         </div>
-        <p class="description">{{manga.descricao}}</p>
-      </div>
-    </div>
-  
-    <div class="chapters-section">
-      <h2>Capítulos</h2>
-      <div class="chapters-list">
-        <div *ngFor="let capitulo of manga.capitulos" class="chapter-item">
-          <div class="chapter-info">
-            <span class="chapter-number">Capítulo {{capitulo.numero}}</span>
-            <span class="chapter-title">{{capitulo.titulo}}</span>
-            <span class="chapter-date">{{capitulo.dataPublicacao | date}}</span>
-            <span class="page-count" *ngIf="capitulo.paginas?.length">
-              ({{capitulo.paginas.length}} páginas)
-            </span>
-          </div>
-          <button 
-            *ngIf="capitulo.paginas?.length"
-            class="read-button" 
-            (click)="visualizarCapitulo(capitulo)"
-          >
-            Ler
-          </button>
-          <span *ngIf="!capitulo.paginas?.length" class="no-pages">
-            Sem páginas disponíveis
-          </span>
-        </div>
-      </div>
-    </div>
-  
-    <div class="anime-info" *ngIf="manga.animeAdaptacao">
-      <h2>Adaptação em Anime</h2>
-      <div class="anime-details">
-        <h3>{{manga.animeAdaptacao.titulo}}</h3>
-        <p>Temporadas: {{manga.animeAdaptacao.temporadas}}</p>
-        <p>Episódios: {{manga.animeAdaptacao.episodios}}</p>
-        <p>Status: {{manga.animeAdaptacao.status}}</p>
+        <button 
+          *ngIf="capitulo.paginas?.length"
+          class="read-button" 
+          (click)="visualizarCapitulo(capitulo)"
+        >
+          Ler
+        </button>
+        <span *ngIf="!capitulo.paginas?.length" class="no-pages">
+          Sem páginas disponíveis
+        </span>
       </div>
     </div>
   </div>
+
+  <!-- Anime Info Section -->
+  <div class="anime-info" *ngIf="manga.animeAdaptacao">
+    <h2>Adaptação em Anime</h2>
+    <div class="anime-details">
+      <h3>{{manga.animeAdaptacao.titulo}}</h3>
+      <p>Temporadas: {{manga.animeAdaptacao.temporadas}}</p>
+      <p>Episódios: {{manga.animeAdaptacao.episodios}}</p>
+      <p class="anime-status">Status: {{manga.animeAdaptacao.status}}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-state" *ngIf="!(manga$ | async)">
+  <p>Carregando detalhes do mangá...</p>
+</div>

@@ -11,7 +11,7 @@ import { MangaViewerComponent } from '../../components/manga-viewer/manga-viewer
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MangaViewerComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -31,8 +31,7 @@ export class HomeComponent implements OnInit {
     imageUrl: '',
     generos: [],
     capitulos: [],
-    temAnime: false,
-    animeAdaptacao: undefined
+    temAnime: false
   };
 
   constructor() {
@@ -50,8 +49,7 @@ export class HomeComponent implements OnInit {
       imageUrl: '',
       generos: [],
       capitulos: [],
-      temAnime: false,
-      animeAdaptacao: undefined
+      temAnime: false
     };
     this.generosInput = '';
     this.isEditing = false;
@@ -62,48 +60,41 @@ export class HomeComponent implements OnInit {
     const hasAnime = event.target.checked;
     this.novoManga.temAnime = hasAnime;
     
-    if (hasAnime) {
+    if (!hasAnime) {
+      delete this.novoManga.animeAdaptacao;
+    } else {
       this.novoManga.animeAdaptacao = {
         titulo: '',
         temporadas: 1,
         episodios: 1,
         status: 'Em andamento'
       };
-    } else {
-      this.novoManga.animeAdaptacao = undefined;
     }
   }
 
   async registrarManga() {
     try {
-      // Validar campos básicos
+      // Validar apenas campos básicos obrigatórios
       if (!this.novoManga.titulo || !this.novoManga.descricao || !this.novoManga.autor || !this.novoManga.imageUrl) {
         alert('Por favor, preencha todos os campos obrigatórios.');
         return;
       }
 
-      // Validar campos do anime apenas se temAnime for true
-      if (this.novoManga.temAnime) {
-        if (!this.novoManga.animeAdaptacao?.titulo || 
-            !this.novoManga.animeAdaptacao?.temporadas || 
-            !this.novoManga.animeAdaptacao?.episodios) {
-          alert('Por favor, preencha todas as informações do anime.');
-          return;
-        }
-      }
-
+      // Preparar dados para salvar
       this.novoManga.generos = this.generosInput.split(',').map(g => g.trim());
       const mangaCollection = collection(this.firestore, 'mangas');
       
-      const mangaData = { 
-        ...this.novoManga,
-        // Se não tem anime, garantir que os campos relacionados sejam undefined
-        animeAdaptacao: this.novoManga.temAnime ? this.novoManga.animeAdaptacao : undefined
-      };
+      // Criar uma cópia do objeto para manipulação
+      const mangaData = { ...this.novoManga };
+      
+      // Limpar os dados relacionados ao anime quando não houver adaptação
+      if (!mangaData.temAnime) {
+        mangaData.animeAdaptacao = null;
+      }
 
       if (this.isEditing && this.editingId) {
         const mangaRef = doc(this.firestore, 'mangas', this.editingId);
-        delete mangaData.id;
+        delete (mangaData as any).id;
         await updateDoc(mangaRef, mangaData);
         alert('Mangá atualizado com sucesso!');
       } else {
@@ -149,9 +140,12 @@ export class HomeComponent implements OnInit {
     
     this.novoManga = {
       ...manga,
-      temAnime: manga.temAnime || false,
-      animeAdaptacao: manga.animeAdaptacao ? { ...manga.animeAdaptacao } : undefined
+      temAnime: manga.temAnime || false
     };
+    
+    if (manga.animeAdaptacao) {
+      this.novoManga.animeAdaptacao = { ...manga.animeAdaptacao };
+    }
     
     this.generosInput = manga.generos.join(', ');
   }

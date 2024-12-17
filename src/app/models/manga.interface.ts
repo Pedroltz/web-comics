@@ -6,8 +6,8 @@ export interface Manga {
   generos: string[];
   imageUrl: string;
   capitulos: Capitulo[];
-  temAnime: boolean;
-  animeAdaptacao?: AnimeInfo;
+  temAnime?: boolean; 
+  animeAdaptacao?: AnimeInfo | undefined | null; 
 }
 
 export interface Capitulo {
@@ -24,8 +24,8 @@ export interface Pagina {
 }
 
 export interface AnimeInfo {
-  titulo: string;
-  temporadas: number;
-  episodios: number;
-  status: 'Em andamento' | 'Finalizado';
+  titulo?: string;
+  temporadas?: number; 
+  episodios?: number; 
+  status?: 'Em andamento' | 'Finalizado'; 
 }

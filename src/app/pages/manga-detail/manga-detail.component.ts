@@ -20,11 +20,13 @@ export class MangaDetailComponent implements OnInit {
   manga$!: Observable<Manga | null>;
   selectedCapitulo?: Capitulo;
   isViewing: boolean = false;
+  mangaId: string = '';
 
   ngOnInit() {
-    const mangaId = this.route.snapshot.paramMap.get('id');
-    if (mangaId) {
-      this.manga$ = this.mangaService.getMangaById(mangaId).pipe(
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.mangaId = id;
+      this.manga$ = this.mangaService.getMangaById(id).pipe(
         tap(manga => console.log('Mangá carregado:', manga))
       );
     }

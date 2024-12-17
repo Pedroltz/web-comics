@@ -1,42 +1,87 @@
-<div class="viewer-container">
+<div class="manga-viewer">
+  <div class="viewer-container">
+    <!-- Header -->
     <div class="viewer-header">
-      <h2>{{capitulo.titulo}}</h2>
-      <div class="page-info">
-        Página {{currentPage + 1}} de {{totalPages}}
+      <div class="header-content">
+        <h2 class="title">{{capitulo.titulo}}</h2>
+        <div class="page-info">{{currentPage + 1}}/{{totalPages}}</div>
+      </div>
+
+      <div class="header-controls">
+        <div class="zoom-controls">
+          <button class="control-button" (click)="zoomOut()" [disabled]="scale <= 0.5" aria-label="Diminuir zoom">
+            <span>-</span>
+          </button>
+          <button class="control-button" (click)="resetZoom()" [disabled]="scale === 1" aria-label="Resetar zoom">
+            <span>100%</span>
+          </button>
+          <button class="control-button" (click)="zoomIn()" [disabled]="scale >= 3" aria-label="Aumentar zoom">
+            <span>+</span>
+          </button>
+        </div>
+        <button class="back-button" (click)="voltarParaDetalhe()" aria-label="Voltar para detalhes">
+          Voltar
+        </button>
       </div>
     </div>
-  
-    <div class="viewer-content" (click)="nextPage()">
-      <button 
-        class="nav-button prev" 
-        (click)="previousPage(); $event.stopPropagation()"
-        [class.disabled]="currentPage === 0"
-      >‹</button>
+
+    <!-- Main Content -->
+    <div class="viewer-content" 
+         (wheel)="onWheel($event)"
+         (mousedown)="onMouseDown($event)"
+         (mousemove)="onMouseMove($event)"
+         (mouseup)="onMouseUp()"
+         (mouseleave)="onMouseLeave()"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd()"
+         [class.zoomed]="scale > 1">
       
-      <img 
-        *ngIf="currentPageUrl"
-        [src]="currentPageUrl" 
-        [alt]="'Página ' + (currentPage + 1)"
-        class="manga-page"
-      >
-      <div *ngIf="!currentPageUrl" class="error-message">
-        Imagem não encontrada
+      <button class="nav-button prev" 
+              (click)="previousPage(); $event.stopPropagation()"
+              *ngIf="currentPage > 0"
+              aria-label="Página anterior">
+        ‹
+      </button>
+
+      <div class="image-container" 
+           [class.is-draggable]="scale > 1"
+           [style.cursor]="isDragging ? 'grabbing' : (scale > 1 ? 'grab' : 'default')">
+        <img *ngIf="currentPageUrl" 
+             [src]="currentPageUrl" 
+             [alt]="'Página ' + (currentPage + 1)"
+             class="manga-page"
+             [style.transform]="imageTransform"
+             draggable="false"/>
+        
+        <div *ngIf="!currentPageUrl" class="error-message">
+          Imagem não encontrada
+        </div>
       </div>
-      
-      <button 
-        class="nav-button next" 
-        (click)="nextPage(); $event.stopPropagation()"
-        [class.disabled]="currentPage === totalPages - 1"
-      >›</button>
-    </div>
-  
-    <div class="page-navigator">
-      <button 
-        *ngFor="let pagina of capitulo.paginas; let i = index"
-        [class.active]="i === currentPage"
-        (click)="goToPage(i)"
-      >
-        {{ i + 1 }}
+
+      <button class="nav-button next" 
+              (click)="nextPage(); $event.stopPropagation()"
+              *ngIf="currentPage < totalPages - 1"
+              aria-label="Próxima página">
+        ›
       </button>
     </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="thumbnails-scroll">
+        <div class="thumbnails-container">
+          <div *ngFor="let page of capitulo.paginas; let i = index"
+               class="thumbnail-item"
+               [class.active]="i === currentPage"
+               (click)="goToPage(i)">
+            <img [src]="page.imageUrl" 
+                 [alt]="'Miniatura ' + (i + 1)"
+                 class="thumbnail"/>
+            <span class="page-number">{{i + 1}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
