@@ -1,0 +1,196 @@
+.tag-manager {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Formulário */
+  .tag-form {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+  
+  .tag-form h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+  }
+  
+  /* Botões */
+  .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+  }
+  
+  .button-group button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-submit {
+    background-color: #4a90e2;
+    color: white;
+    flex: 1;
+  }
+  
+  .btn-submit:hover {
+    background-color: #357abd;
+  }
+  
+  .btn-cancel {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #5a6268;
+  }
+  
+  /* Lista de Tags */
+  .tags-list {
+    margin-top: 40px;
+  }
+  
+  .tags-list h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.3rem;
+  }
+  
+  .tag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .tag-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .tag-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .tag-content {
+    padding: 15px;
+  }
+  
+  .tag-content h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .tag-description {
+    color: #666;
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+  
+  .tag-usage {
+    color: #888;
+    font-size: 0.85em;
+    margin: 5px 0;
+  }
+  
+  .tag-date {
+    color: #888;
+    font-size: 0.85em;
+    margin: 5px 0;
+  }
+  
+  .tag-actions {
+    display: flex;
+    border-top: 1px solid #eee;
+  }
+  
+  .tag-actions button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-edit {
+    color: #4a90e2;
+  }
+  
+  .btn-edit:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+  }
+  
+  .btn-delete {
+    color: #dc3545;
+  }
+  
+  .btn-delete:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .tag-manager {
+      padding: 15px;
+    }
+  
+    .tag-form {
+      padding: 20px;
+    }
+  
+    .tag-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .button-group {
+      flex-direction: column;
+    }
+  
+    .button-group button {
+      width: 100%;
+    }
+  }

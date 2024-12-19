@@ -1,0 +1,67 @@
+<div class="tag-manager">
+    <!-- Formulário de Tag -->
+    <div class="tag-form">
+      <h2>{{ isEditing ? 'Editar Tag' : 'Criar Nova Tag' }}</h2>
+      
+      <div class="form-group">
+        <label for="tagName">Nome da Tag:</label>
+        <input 
+          id="tagName" 
+          [(ngModel)]="novaTag.nome" 
+          type="text" 
+          required
+          placeholder="Nome da tag">
+      </div>
+  
+      <div class="form-group">
+        <label for="tagDesc">Descrição:</label>
+        <textarea 
+          id="tagDesc" 
+          [(ngModel)]="novaTag.descricao" 
+          rows="3"
+          placeholder="Descrição opcional"></textarea>
+      </div>
+  
+      <div class="button-group">
+        <button class="btn-submit" (click)="salvarTag()">
+          {{ isEditing ? 'Atualizar' : 'Criar' }} Tag
+        </button>
+        <button 
+          *ngIf="isEditing" 
+          class="btn-cancel" 
+          (click)="cancelarEdicao()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  
+    <!-- Lista de Tags -->
+    <div class="tags-list">
+      <h3>Tags Existentes</h3>
+      <div class="tag-grid">
+        <div *ngFor="let tag of tags$ | async" class="tag-card">
+          <div class="tag-content">
+            <h4>{{tag.nome}}</h4>
+            <p class="tag-description" *ngIf="tag.descricao">
+              {{tag.descricao}}
+            </p>
+            <p class="tag-usage">
+              Usado em {{tag.usageCount}} mangá(s)
+            </p>
+            <p class="tag-date">
+              Criado em: {{tag.dataCriacao | date}}
+            </p>
+          </div>
+  
+          <div class="tag-actions">
+            <button class="btn-edit" (click)="editarTag(tag)">
+              Editar
+            </button>
+            <button class="btn-delete" (click)="deletarTag(tag.id!)">
+              Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,40 @@
+<div class="tag-selector">
+    <!-- Search Box -->
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchText"
+        (input)="onSearch()"
+        placeholder="Buscar tags...">
+    </div>
+  
+    <!-- Available Tags -->
+    <div class="tags-container">
+      <div *ngFor="let tagSelection of filteredTags" 
+           class="tag-option"
+           [class.selected]="tagSelection.selected"
+           (click)="toggleTag(tagSelection)">
+        <span class="tag-name">{{tagSelection.tag.nome}}</span>
+        <span *ngIf="tagSelection.selected" class="check-mark">✓</span>
+      </div>
+  
+      <!-- Empty State -->
+      <div *ngIf="filteredTags.length === 0" class="empty-state">
+        <p *ngIf="searchText">Nenhuma tag encontrada para "{{searchText}}"</p>
+        <p *ngIf="!searchText">Nenhuma tag disponível</p>
+      </div>
+    </div>
+  
+    <!-- Selected Tags -->
+    <div class="selected-tags" *ngIf="selectedTags.length > 0">
+      <h4>Tags Selecionadas:</h4>
+      <div class="tag-chips">
+        <div *ngFor="let tag of selectedTags" class="tag-chip">
+          <span class="tag-name">{{tag.nome}}</span>
+          <button class="remove-tag" (click)="removeTag(tag); $event.stopPropagation()">
+            ×
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

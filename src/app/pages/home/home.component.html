@@ -1,4 +1,13 @@
 <div class="container">
+  <!-- Header -->
+  <div class="header-actions">
+    <h1>Gerenciar Mangás</h1>
+    <a routerLink="/tags" class="manage-tags-button">
+      <span class="tag-icon">🏷️</span>
+      Gerenciar Tags
+    </a>
+  </div>
+
   <!-- Formulário de Cadastro/Edição -->
   <div class="form-container">
     <h2>{{ isEditing ? 'Editar Mangá' : 'Registrar Novo Mangá' }}</h2>
@@ -44,6 +53,14 @@
     </div>
 
     <div class="form-group">
+      <label>Tags:</label>
+      <app-tag-selector 
+        [(selectedTagIds)]="novoManga.tagIds"
+        (selectedTagsChange)="onTagsSelected($event)">
+      </app-tag-selector>
+    </div>
+
+    <div class="form-group">
       <label for="generos">Gêneros (separados por vírgula):</label>
       <input 
         id="generos" 
@@ -57,7 +74,7 @@
     <div class="capitulos-section">
       <h3>Capítulos</h3>
       <button class="add-button" (click)="adicionarCapitulo()">
-        <i class="plus-icon"></i> Adicionar Capítulo
+        Adicionar Capítulo
       </button>
 
       <div class="capitulo-item" *ngFor="let capitulo of novoManga.capitulos; let i = index">
@@ -173,12 +190,25 @@
   <div class="manga-grid">
     <div class="manga-card" *ngFor="let manga of mangas$ | async">
       <a [routerLink]="['/manga', manga.id]" class="manga-link">
-        <img [src]="manga.imageUrl" [alt]="manga.titulo" class="manga-cover">
+        <img [src]="manga.imageUrl" 
+             [alt]="manga.titulo" 
+             class="manga-cover"
+             loading="lazy">
         
         <div class="manga-info">
           <h3>{{manga.titulo}}</h3>
           <div class="author">por {{manga.autor}}</div>
           <div class="description">{{manga.descricao}}</div>
+
+          <!-- Tags do Mangá -->
+          <div class="tag-chips">
+            <ng-container *ngFor="let tagId of manga.tagIds">
+              <div *ngIf="(getTag(tagId) | async) as tag" 
+                   class="tag-chip">
+                <span class="tag-name">{{tag.nome}}</span>
+              </div>
+            </ng-container>
+          </div>
 
           <div class="genre-tags">
             <span class="genre-tag" *ngFor="let genero of manga.generos">
@@ -189,7 +219,7 @@
           <div class="chapters">
             <h4>Capítulos</h4>
             <ul>
-              <li *ngFor="let capitulo of manga.capitulos">
+              <li *ngFor="let capitulo of manga.capitulos.slice(0, 3)">
                 <span class="chapter-number">{{capitulo.numero}}</span>
                 <span class="chapter-title">{{capitulo.titulo}}</span>
                 <span class="page-count" *ngIf="capitulo.paginas?.length">
@@ -197,6 +227,9 @@
                 </span>
               </li>
             </ul>
+            <div *ngIf="manga.capitulos.length > 3" class="more-chapters">
+              + {{manga.capitulos.length - 3}} mais capítulos
+            </div>
           </div>
 
           <div class="anime-info" *ngIf="manga.temAnime && manga.animeAdaptacao">
@@ -226,5 +259,11 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="loading-indicator">
+    <div class="spinner"></div>
+    <p>Carregando mais mangás...</p>
   </div>
 </div>

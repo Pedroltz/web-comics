@@ -1,13 +1,16 @@
+// src/app/models/manga.interface.ts
+
 export interface Manga {
   id?: string;
   titulo: string;
   descricao: string;
   autor: string;
   generos: string[];
+  tagIds: string[];
   imageUrl: string;
   capitulos: Capitulo[];
-  temAnime?: boolean; 
-  animeAdaptacao?: AnimeInfo | undefined | null; 
+  temAnime?: boolean;
+  animeAdaptacao?: AnimeInfo | undefined | null;
 }
 
 export interface Capitulo {
@@ -25,7 +28,7 @@ export interface Pagina {
 
 export interface AnimeInfo {
   titulo?: string;
-  temporadas?: number; 
-  episodios?: number; 
-  status?: 'Em andamento' | 'Finalizado'; 
+  temporadas?: number;
+  episodios?: number;
+  status?: 'Em andamento' | 'Finalizado';
 }

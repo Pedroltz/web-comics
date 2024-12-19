@@ -21,5 +21,10 @@ export const routes: Routes = [
   {
     path: 'register',
     loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent)
+  },
+  {
+    path: 'tags',
+    loadComponent: () => import('./components/tag-manager/tag-manager.component')
+      .then(m => m.TagManagerComponent)
   }
 ];

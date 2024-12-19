@@ -37,11 +37,28 @@
          (touchend)="onTouchEnd()"
          [class.zoomed]="scale > 1">
       
+      <!-- Área clicável esquerda -->
+      <div class="click-area left" 
+           (click)="scale === 1 && previousPage()"
+           *ngIf="currentPage > 0">
+      </div>
+
       <button class="nav-button prev" 
-              (click)="previousPage(); $event.stopPropagation()"
               *ngIf="currentPage > 0"
               aria-label="Página anterior">
         ‹
+      </button>
+
+      <!-- Área clicável direita -->
+      <div class="click-area right" 
+           (click)="scale === 1 && nextPage()"
+           *ngIf="currentPage < totalPages - 1">
+      </div>
+
+      <button class="nav-button next" 
+              *ngIf="currentPage < totalPages - 1"
+              aria-label="Próxima página">
+        ›
       </button>
 
       <div class="image-container" 
@@ -58,15 +75,11 @@
           Imagem não encontrada
         </div>
       </div>
-
-      <button class="nav-button next" 
-              (click)="nextPage(); $event.stopPropagation()"
-              *ngIf="currentPage < totalPages - 1"
-              aria-label="Próxima página">
-        ›
-      </button>
     </div>
 
+    <!-- Hover Area -->
+    <div class="hover-area"></div>
+    
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
       <div class="thumbnails-scroll">
@@ -77,7 +90,8 @@
                (click)="goToPage(i)">
             <img [src]="page.imageUrl" 
                  [alt]="'Miniatura ' + (i + 1)"
-                 class="thumbnail"/>
+                 class="thumbnail"
+                 loading="lazy"/>
             <span class="page-number">{{i + 1}}</span>
           </div>
         </div>

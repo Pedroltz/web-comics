@@ -60,7 +60,7 @@
   gap: 0.25rem;
 }
 
-/* Buttons */
+/* Button Styles */
 .control-button {
   width: 36px;
   height: 36px;
@@ -100,6 +100,53 @@
   background: #357abd;
 }
 
+/* Click Areas and Navigation */
+.click-area {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.click-area.left {
+  left: 0;
+}
+
+.click-area.right {
+  right: 0;
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  z-index: 10;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.nav-button:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.nav-button.prev { left: 8px; }
+.nav-button.next { right: 8px; }
+
 /* Content Area */
 .viewer-content {
   flex: 1;
@@ -115,6 +162,10 @@
 
 .viewer-content.zoomed {
   cursor: move;
+}
+
+.viewer-content.zoomed .click-area {
+  display: none;
 }
 
 .image-container {
@@ -137,37 +188,10 @@
   will-change: transform;
 }
 
-/* Navigation Buttons */
-.nav-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  border: none;
-  color: white;
-  width: 40px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.5rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.nav-button:hover {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.nav-button.prev { left: 8px; }
-.nav-button.next { right: 8px; }
-
 /* Bottom Navigation */
 .bottom-nav {
-  position: absolute;
-  bottom: 0;
+  position: fixed;
+  bottom: -80px;
   left: 0;
   right: 0;
   background: linear-gradient(
@@ -177,6 +201,25 @@
     transparent 100%
   );
   padding: 1rem;
+  transition: all 0.3s ease-in-out;
+  height: 100px;
+  z-index: 1000;
+}
+
+.hover-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-color: transparent;
+  z-index: 999;
+  cursor: pointer;
+}
+
+.hover-area:hover + .bottom-nav,
+.bottom-nav:hover {
+  bottom: 0;
 }
 
 .thumbnails-scroll {
@@ -190,6 +233,7 @@
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
+  padding-bottom: 0.25rem;
   justify-content: center;
   min-height: 70px;
 }
@@ -268,27 +312,16 @@
     width: 32px;
     height: 48px;
     font-size: 1.25rem;
+    opacity: 0.6;
   }
 
   .manga-page {
     max-height: calc(100vh - 160px);
   }
 
-  .thumbnail {
-    height: 40px;
-    width: 28px;
-  }
-}
-
-/* Touch Device Optimizations */
-@media (hover: none) {
-  .nav-button {
-    opacity: 0.8;
-    background: rgba(0, 0, 0, 0.6);
-  }
-
-  .thumbnail-item:hover {
-    transform: none;
+  .bottom-nav,
+  .hover-area {
+    display: none;
   }
 }
 
@@ -302,37 +335,7 @@
     max-height: calc(100vh - 120px);
   }
 
-  .bottom-nav {
-    padding: 0.5rem;
-  }
-
-  .thumbnails-container {
-    min-height: 50px;
-  }
-
-  .thumbnail {
-    height: 35px;
-    width: 25px;
-  }
-}
-
-/* High-DPI Screens */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .control-button,
-  .back-button,
   .nav-button {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .manga-viewer {
-    background-color: #000;
-  }
-  
-  .viewer-container {
-    background-color: #000;
+    opacity: 0.5;
   }
 }
